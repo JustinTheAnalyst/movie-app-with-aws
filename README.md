@@ -2,7 +2,7 @@
 
 #1 Building an elegant React Cinema app with continuous integration/delivery (CI/CD) and automatic deployment
 
-##2 Technologies used in this project will involve:
+##2 Technologies that might be using in this project involve:
 
 - React
 - Redux
