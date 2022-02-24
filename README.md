@@ -1,4 +1,4 @@
-- STILL UNDER DEVELOPMENT -
+--STILL UNDER DEVELOPMENT--
 
 #1 Building an elegant React Cinema app with continuous integration/delivery (CI/CD) and automatic deployment
 
