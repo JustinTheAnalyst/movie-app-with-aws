@@ -116,6 +116,6 @@ workflows:
           filters:
             branches:
               only:
-                - develop
+                - dev
                 - staging
                 - master         
