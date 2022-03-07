@@ -22,7 +22,7 @@
 --> IAM user-ok
 --> Buckets-ok
 --> CloudFront-ok
-4. Setup config.yml
+4. Setup build and deploy jobs to circleci config.yml
 --> Add Build Job to CircleCI Config
 --> Add install Command to Build Job
 --> AWS S3 CircleCI Job
