@@ -107,7 +107,7 @@ workflows:
           filters:
             branches:
               only:
-                - dev
+                - develop
                 - staging
                 - master    
       - deploy-to-aws-cloudfront:
@@ -116,6 +116,6 @@ workflows:
           filters:
             branches:
               only:
-                - dev
+                - develop
                 - staging
                 - master         
