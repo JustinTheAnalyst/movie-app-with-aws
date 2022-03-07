@@ -1,123 +1,121 @@
 version: 2.1
-
+ 
 jobs:
-  build:
+  build: 
     docker:
       - image: circleci/node:16.13.2
     working_directory: ~/repo
-    steps: 
+    steps:
       - checkout
-      - run:
+      - run: 
           name: Show current branch
           command: echo ${CIRCLE_BRANCH}
-      - restore_cache: 
+      - restore_cache:
           keys: 
-            - app-{{ checksum "package.json" }}
+            - app-{{ checksum "package.josn" }}
             - app-
-      - run: 
+      - run:
           name: Install dependencies
           command: npm install
       - save_cache:
           paths:
-           - node_modules
+            - node_modules
           key: app-{{ checksum "package.json" }}
-
-  deploy-to-aws-s3: 
+ 
+  deploy-to-aws-s3:
     docker:
       - image: circleci/node:16.13.2
     working_directory: ~/repo
-    steps: 
+    steps:
       - checkout
-      - run: 
+      - run:
           name: Show current branch
           command: echo ${CIRCLE_BRANCH}
-      - run: 
-          name: Installing AWS CLI
+      - run:
+          name: Installing AWS CLI 
           working_directory: /
           command: |
             sudo apt-get -y -qq update
             sudo apt-get install -y awscli
-            sudo apt-get install -y python-dev build-essential
+            sudo apt-get install -y python-pip python-dev build-essential
       - run:
-          name: Build Project
+          name: Build project
           command: |
             npm install
             npm run build
             cd build
-            zip ../build.zip -r * .[^.]*
-            echo "Build Successful"
+            zip ../build.zip -r *.[^.]*
+            echo "Build successful"
       - run:
           name: Deploy to AWS S3
           command: |
             if [ "${CIRCLE_BRANCH}" == "master" ]
             then
               aws --region ${AWS_REGION} s3 sync ~/repo/build s3://${AWS_BUCKET_PRODUCTION} --delete
-            elif [ "${CIRCLE_BRANCH}" == "staging" ]
+            elif [ ${CIRCLE_BRANCH}" == "staging" ]
             then
-              aws --region ${AWS_REGION} s3 sync ~/repo/build s3://${AWS_BUCKET_STAGING} --delete
+              aws --region ${AWS_REGION} s3 sync ~/repo/build s3://${AWS_BUCKET_STAGING} --delete          
             else
-            then
               aws --region ${AWS_REGION} s3 sync ~/repo/build s3://${AWS_DEV_BUCKET} --delete
             fi
-
-  deploy-to-aws-cloudfront: 
+ 
+  deploy-to-aws-cloudfront:
     docker:
       - image: circleci/node:16.13.2
     working_directory: ~/repo
-    steps: 
+    steps:
       - checkout
-      - run: 
+      - run:
           name: Show current branch
           command: echo ${CIRCLE_BRANCH}
-      - run: 
-          name: Installing AWS CLI
+      - run:
+          name: Installing AWS CLI 
           working_directory: /
           command: |
             sudo apt-get -y -qq update
             sudo apt-get install -y awscli
-            sudo apt-get install -y python-dev build-essential
+            sudo apt-get install -y python-pip python-dev build-essential
       - run:
-          name: Build Project
+          name: Build project
           command: |
             npm install
             npm run build
             cd build
-            zip ../build.zip -r * .[^.]*
-            echo "Build Successful"
+            zip ../build.zip -r *.[^.]*
+            echo "Build successful"
       - run:
-          name: Deploy to AWS Cloudfront
+          name: Deploy to AWS S3
           command: |
             aws configure set preview.cloudfront true
             if [ "${CIRCLE_BRANCH}" == "master" ]
             then
-              aws cloudfront create-invalidation -distribution-id ${PRODUCTION_DISTRIBUTION_ID} --path /\*
-            elif [ "${CIRCLE_BRANCH}" == "staging" ]
+              aws cloudfront create-invalidation --distrubtion-id ${PRODUCTION_DISTRIBUTION_ID} --paths /\*
+            elif [ ${CIRCLE_BRANCH}" == "staging" ]
             then
-              aws cloudfront create-invalidation -distribution-id ${STAGING_DISTRIBUTION_ID} --path /\*
+              aws cloudfront create-invalidation --distrubtion-id ${STAGING_DISTRIBUTION_ID} --paths /\*         
             else
-            then
-              aws cloudfront create-invalidation -distribution-id ${DEV_DISTRIBUTION_ID} --path /\*
+              aws cloudfront create-invalidation --distrubtion-id ${DEV_DISTRIBUTION_ID} --paths /\*
             fi
-
-  workflows:
-    build_and_deploy:
-      jobs:
-        - build
-        - deploy-to-aws-s3:
-            requires:
-              - build
-            filters:
-              branches:
-                only:
-                  - develop
-                  - staging
-                  - master
-        - deploy-to-aws-cloudfront:
-            requires:
-              - deploy-to-aws-s3
-            filters:
-              branches:
-                only:
-                  - develop
-                  - staging
-                  - master
+ 
+workflows:
+  build_and_deploy:
+    jobs:
+      - build
+      - deploy-to-aws-s3:
+          requires:
+            - build
+          filters:
+            branches:
+              only:
+                - dev
+                - staging
+                - master    
+      - deploy-to-aws-cloudfront:
+          requires:
+            - deploy-to-aws-s3
+          filters:
+            branches:
+              only:
+                - dev
+                - staging
+                - master         
