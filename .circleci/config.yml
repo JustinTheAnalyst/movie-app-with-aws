@@ -39,7 +39,7 @@ aliases:
         npm install
         npm run build
         cd build
-        zip ../build.zip -r * .[^.]*
+        zip ../build.zip -r *.[^.]*
         echo "Build successful"
 
 jobs:
@@ -51,16 +51,6 @@ jobs:
       - *restore-cache
       - *install-dependencies
       - *save-cache
- 
-  # linting: 
-  #   executor: app-executor
-  #   steps:
-  #     - checkout
-  #     - *show-current-branch-name
-  #     - *restore-cache
-  #     - run: 
-  #         name: Run linting
-  #         command: npm run lint
 
   deploy-to-aws-s3:
     executor: app-executor
@@ -107,9 +97,6 @@ workflows:
   build_and_deploy:
     jobs:
       - build
-      # - linting:
-      #     requires:
-      #       - build
       - deploy-to-aws-s3:
           requires:
             - build
