@@ -37,3 +37,8 @@
 - deploy linting job
 6. install and add prettier config
 - npm add -D prettier
+
+********************somehow single quote is not working on eslint and prettier so I replaced wit \" ***********************
+    "lint": "eslint \"src/**/*.js*\"",
+    "prettier:check": "prettier --check \"src/**/*.{js,jsx,json}\"",
+    "prettier:write": "prettier --write \"src/**/*.{js,jsx,json}\"",
